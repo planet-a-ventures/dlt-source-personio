@@ -17,7 +17,7 @@ main() {
     log "Current Python version: ${python_version}"
 
     datamodel-codegen \
-        --input spec/spec/*.yaml \
+        --input spec/*.yaml \
         --output spec.py \
         --output-model-type pydantic_v2.BaseModel \
         --use-annotated \

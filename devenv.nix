@@ -26,7 +26,7 @@
 
   scripts.update-spec.exec = ''
     GIT_MERGE_AUTOEDIT=no \
-      git subtree add \
+      git subtree update \
       --prefix dlt_source_personio/model/spec \
       https://github.com/personio/api-docs.git \
       master \
