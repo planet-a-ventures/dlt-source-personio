@@ -1,0 +1,3 @@
+# exclude = [
+#     "dlt_source_personio/model/spec",
+# ]

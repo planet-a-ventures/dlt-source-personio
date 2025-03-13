@@ -1,3 +1,4 @@
 ignore: |
   .pre-commit-config.yaml
+  dlt_source_personio/model/spec/
 document-start: false

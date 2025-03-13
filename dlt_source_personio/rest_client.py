@@ -1,75 +1,68 @@
-from json import dumps
 from typing import Any
 import logging
 from pydantic import ValidationError
 
 import dlt
-from dlt.sources.helpers.rest_client.auth import APIKeyAuth
 from dlt.sources.helpers.rest_client.client import RESTClient, Response
-from dlt.sources.helpers.rest_client.paginators import (
-    PageNumberPaginator,
-    SinglePagePaginator,
-)
-from urllib3 import Retry
-from requests.adapters import HTTPAdapter
+from dlt.sources.helpers.rest_client.paginators import JSONLinkPaginator
+
+from .personio_oauth2_client_credentials import PersonioOAuth2ClientCredentials
+from .settings import x_personio_app_id
 
 from .settings import API_BASE
 from dlt.sources.helpers.requests.session import Session
-from .type_adapters import error_adapter
-
 
 # Share a session (and thus pool) between all rest clients
-session: Session = None
+session: Session = Session(raise_for_status=False)
+
+auth: PersonioOAuth2ClientCredentials = None
 
 
 def get_rest_client(
-    email: str = dlt.secrets["personio_email"],
-    api_key: str = dlt.secrets["personio_api_key"],
     api_base: str = API_BASE,
-    single_page: bool = False,
 ):
     global session
+    global auth
+
+    if auth is None:
+        auth = PersonioOAuth2ClientCredentials(
+            api_base=api_base,
+            client_id=dlt.secrets["personio_client_id"],
+            client_secret=dlt.secrets["personio_client_secret"],
+            default_token_expiration=86400,
+            session=session,
+        )
+
     client = RESTClient(
         base_url=api_base,
-        headers={"Accept": "application/json", "personioemail": email},
-        auth=APIKeyAuth(name="personiokey", api_key=api_key),
-        data_selector="$",
-        paginator=(
-            SinglePagePaginator()
-            if single_page
-            else PageNumberPaginator(
-                base_page=BASE_PAGE,
-                stop_after_empty_page=True,
-                total_path=None,
-            )
-        ),
+        headers={
+            "Accept": "application/json",
+            "X-Personio-App-ID": x_personio_app_id,
+        },
+        auth=auth,
+        data_selector="_data",
+        paginator=JSONLinkPaginator(next_url_path="_meta.links.next.href"),
         session=session,
     )
-    if not session:
-        session = client.session
-        retry = Retry(total=5, backoff_factor=0.2, status_forcelist=[521])
-        adapter = HTTPAdapter(max_retries=retry)
-        session.mount(API_BASE, adapter)
-    return client
+    return client, auth
 
 
-def raise_if_error(response: Response, *args: Any, **kwargs: Any) -> None:
-    if response.status_code < 200 or response.status_code >= 300:
-        if response.headers.get("Content-Type", "").startswith("application/json"):
-            try:
-                error = error_adapter.validate_json(response.text)
-                response.reason = error.error
-                # TODO: This is not great at all, an error code and/or a 204 response would be a lot better
-                if error.error == "There are no startups available.":
-                    response.status_code = 204  # No Content
-                    response._content = dumps([]).encode("utf-8")
-            except ValidationError as e:
-                logging.error(e)
-                logging.debug(response.text)
-                raise e
-        response.raise_for_status()
+def debug_response(response: Response, *args: Any, **kwargs: Any) -> None:
+    if logging.getLogger().isEnabledFor(logging.DEBUG):
+        logging.debug(
+            f"Response: {response.status_code} {response.reason} {response.url} {response.text}"
+        )
 
 
-hooks = {"response": [raise_if_error]}
-MAX_PAGE_LIMIT = 50
-BASE_PAGE = 1
+def raise_for_status(response: Response, *args: Any, **kwargs: Any) -> None:
+    response.raise_for_status()
+
+
+hooks = {
+    "response": [
+        debug_response,
+        raise_for_status,
+    ]
+}
+V2_MAX_PAGE_LIMIT = 1
+V1_BASE_PAGE = 0

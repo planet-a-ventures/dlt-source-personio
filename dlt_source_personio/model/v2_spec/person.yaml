@@ -1,0 +1,399 @@
+openapi: 3.1.0
+info:
+  title: Person
+  version: "2"
+  description: API for listing persons with support for pagination and filtering.
+servers:
+  - url: https://api.personio.de/v2
+paths:
+  /persons:
+    get:
+      summary: List persons
+      description: >
+        Returns a list of persons. The endpoint supports pagination and filtering based on various parameters such as id, first_name, last_name, created_at, updated_at, etc. Filters are combined using the logical "AND" operator.
+
+      security:
+        - oauth2: ["personio:persons:read"]
+      parameters:
+        - name: limit
+          in: query
+          description: >
+            The amount of resources to be returned per one request. It can range between 1 and 50, with a default of 10.
+
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: cursor
+          in: query
+          description: >
+            The pagination cursor to navigate over to the next list of resources. If missing, the first page is returned.
+
+          required: false
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: Filter results matching one or more provided person ids.
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Filter persons matching one or more provided email addresses.
+          required: false
+          schema:
+            type: string
+        - name: first_name
+          in: query
+          description: Filter persons matching the provided first name.
+          required: false
+          schema:
+            type: string
+        - name: last_name
+          in: query
+          description: Filter persons matching the provided last name.
+          required: false
+          schema:
+            type: string
+        - name: preferred_name
+          in: query
+          description: Filter persons matching the provided preferred name.
+          required: false
+          schema:
+            type: string
+        - name: created_at
+          in: query
+          description: Filter persons by creation date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: created_at.gt
+          in: query
+          description: Filter persons created after the provided date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: created_at.lt
+          in: query
+          description: Filter persons created before the provided date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: updated_at
+          in: query
+          description: Filter persons by updated date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: updated_at.gt
+          in: query
+          description: Filter persons updated after the provided date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: updated_at.lt
+          in: query
+          description: Filter persons updated before the provided date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Person'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/auth
+          tokenUrl: https://example.com/token
+          scopes:
+            "personio:persons:read": "Read access to persons"
+  schemas:
+    Person:
+      type: object
+      required:
+        - id
+        - email
+        - created_at
+        - updated_at
+        - first_name
+        - last_name
+        - preferred
+        - gender
+        - profile_picture
+        - custom_attributes
+        - employments
+        - _meta
+        - status
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the Person.
+        email:
+          type: string
+          description: >
+            The email address this Person is connected with. The email is unique per Person, and the same Person can hold different Employments sharing the same email.
+
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp of when the person was created in UTC.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp of when the person was updated in UTC.
+        first_name:
+          type: string
+          description: The first name of the person.
+        last_name:
+          type: string
+          description: The last name of the person.
+        preferred_name:
+          type: string
+          description: The preferred name of the person.
+        gender:
+          type: string
+          enum:
+            - UNSPECIFIED
+            - MALE
+            - FEMALE
+            - DIVERSE
+          description: The gender of the person.
+        profile_picture:
+          type: object
+          description: The person's profile picture.
+          properties:
+            url:
+              type: string
+              format: uri
+              description: The URL to the profile picture.
+        status:
+          type: string
+          enum:
+            - UNSPECIFIED
+            - ACTIVE
+            - INACTIVE
+          description: The status of the person
+        custom_attributes:
+          type: array
+          description: A list of custom attributes.
+          items:
+            $ref: '#/components/schemas/CustomAttribute'
+        employments:
+          type: array
+          description: A list of employments.
+          items:
+            $ref: '#/components/schemas/Employment'
+    CustomAttribute:
+      type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
+      properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        type:
+          type: string
+          enum:
+            - unspecified
+            - string
+            - int
+            - double
+            - date
+            - boolean
+            - string_list
+          description: The type of the custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
+        value:
+          description: The value of the custom attribute.
+          oneOf:
+            - $ref: '#/components/schemas/CustomAttributeValueString'
+            - $ref: '#/components/schemas/CustomAttributeValueInt'
+            - $ref: '#/components/schemas/CustomAttributeValueDouble'
+            - $ref: '#/components/schemas/CustomAttributeValueDate'
+            - $ref: '#/components/schemas/CustomAttributeValueBoolean'
+            - $ref: '#/components/schemas/CustomAttributeValueStringList'
+            - $ref: '#/components/schemas/CustomAttributeUnspecified'
+          discriminator:
+            propertyName: type
+            mapping:
+              string: '#/components/schemas/CustomAttributeValueString'
+              int: '#/components/schemas/CustomAttributeValueInt'
+              double: '#/components/schemas/CustomAttributeValueDouble'
+              date: '#/components/schemas/CustomAttributeValueDate'
+              boolean: '#/components/schemas/CustomAttributeValueBoolean'
+              string_list: '#/components/schemas/CustomAttributeValueStringList'
+              unspecified: '#/components/schemas/CustomAttributeUnspecified'
+    CustomAttributeValueString:
+      type: object
+      properties:
+        type:
+          type: string
+          const: string
+        value:
+          type: string
+      required:
+        - type
+        - value
+    CustomAttributeUnspecified:
+      type: object
+      properties:
+        type:
+          type: string
+          const: unspecified
+        value:
+          type: object
+          additionalProperties: true
+      required:
+        - type
+        - value
+    CustomAttributeValueInt:
+      type: object
+      properties:
+        type:
+          type: string
+          const: int
+        value:
+          type: number
+      required:
+        - type
+        - value
+    CustomAttributeValueDouble:
+      type: object
+      properties:
+        type:
+          type: string
+          const: double
+        value:
+          type: number
+      required:
+        - type
+        - value
+    CustomAttributeValueDate:
+      type: object
+      properties:
+        type:
+          type: string
+          const: date
+        value:
+          type: string
+          format: date-time
+      required:
+        - type
+        - value
+    CustomAttributeValueBoolean:
+      type: object
+      properties:
+        type:
+          type: string
+          const: boolean
+        value:
+          type: boolean
+      required:
+        - type
+        - value
+    CustomAttributeValueStringList:
+      type: object
+      properties:
+        type:
+          type: string
+          const: string_list
+        value:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - value
+    Employment:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: The employment id.
+        _meta:
+          type: object
+          description: >
+            This object represents the metadata information for the employment. It is a set of arbitrary key/value attributes.
+
+          properties:
+            links:
+              type: object
+              additionalProperties: true
+              description: Additional metadata links.
+    BadRequestError:
+      type: object
+      properties:
+        personio_trace_id:
+          type: string
+          description: A unique ID that was created for this error.
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of when the error occurred.
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+      required:
+        - personio_trace_id
+        - timestamp
+        - errors
+    ErrorDetail:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the error.
+        detail:
+          type: string
+          description: A short description about the error.
+        type:
+          type: string
+          format: uri
+          description: A link to the developer hub where more information can be found for the encountered error.
+        _meta:
+          type: object
+          additionalProperties: true
+          description: Has additional fields.
+      required:
+        - title
+        - detail
+        - type
+        - _meta

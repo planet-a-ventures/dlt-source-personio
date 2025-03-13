@@ -3,3 +3,4 @@ eof_newline: true
 exclude:
   - .yamllint
   - .pre-commit-config.yaml
+  - dlt_source_personio/model/spec

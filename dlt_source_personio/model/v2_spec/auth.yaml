@@ -1,0 +1,92 @@
+openapi: 3.1.0
+info:
+  version: '2'
+  title: Authentication
+  description: 'Personio Authentication API V2'
+servers:
+  - url: https://api.personio.de/v2
+paths:
+  /auth/token:
+    post:
+      description: 'Request Authentication Token'
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                  description: API Client id
+                client_secret:
+                  type: string
+                  description: API Client secret
+                grant_type:
+                  type: string
+                  enum:
+                    - client_credentials
+                  description: 'The grant type'
+                scope:
+                  type: string
+                  description: Requested scopes for the issued token. Space-delimited list; order doesn't matter. If no scope is provided, all scopes available to the client will be assigned.
+              required:
+                - client_id
+                - client_secret
+                - grant_type
+      responses:
+        '200':
+          description: 'Authentication token response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationTokenResponse'
+              examples:
+                response:
+                  value:
+                    access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYXBpLmRldi5wZXJzb25pby5kZTozMDAwMS92MS9hdXRoIiwiaWF0IjoxNDg5MDkxMzA2LCJleHAiOjE0ODkxNzc3MDYsIm5iZiI6MTQ4OTA5MTMwNiwianRpIjoiZmU1ZjkxOGY2MDZjOWI4OGMwMzM0ZmJkZjkyYzkwMzgiLCJzdWIiOiJPR014TVdRd1kySmxZbVF6Tm1RNVpqQmxOell6WmpsaSJ9.QZZCdlDjmL-LYdoDx2XLUfhwTdcjDgm9h4t-6JoACiM"
+                    expires_in: 86400
+                    token_type: "Bearer"
+  /auth/revoke:
+    post:
+      description: 'Revoke Authentication Token'
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: The token to revoke
+              required:
+                - token
+      responses:
+        '200':
+          description: 'Token revoked'
+components:
+  schemas:
+    AuthenticationTokenResponse:
+      title: Request Authentication Token response
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_in:
+          type: number
+        scope:
+          type: string
+        token_type:
+          type: string
+          enum:
+            - Bearer
+        refresh_token:
+          type: [string, "null"]
+      required:
+        - access_token
+        - token_type
+        - expires_in
+        - scope
