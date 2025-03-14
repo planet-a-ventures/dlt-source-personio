@@ -62,7 +62,7 @@ def pydantic_model_dump(model: BaseModel, **kwargs):
 
 
 class Table(StrEnum):
-    CUSTOM_ATTRIBUTES = "custom_attributes"
+    CUSTOM_ATTRIBUTES = "persons_custom_attributes"
     EMPLOYMENTS = "employments"
     PERSONS = "persons"
 
