@@ -28,3 +28,7 @@ include = '.*py$'
 [tool.autoflake]
 remove-all-unused-imports = true
 remove-unused-variables = true
+exclude = [
+    "dlt_source_personio/model/v1/**",
+    "dlt_source_personio/model/v2/**",
+]
