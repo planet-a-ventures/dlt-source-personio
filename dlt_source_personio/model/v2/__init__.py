@@ -11,3 +11,7 @@ class MyAuthBaseModel(MyBaseModel):
 
 class MyPersonBaseModel(MyBaseModel):
     pass
+
+
+class MyEmploymentBaseModel(MyBaseModel):
+    pass

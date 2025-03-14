@@ -6,8 +6,8 @@ from __future__ import annotations
 from enum import Enum
 from typing import Annotated, Any, Dict, List, Literal
 
-from pendulum import DateTime
-from pydantic import AnyUrl, Field
+from pendulum import Date, DateTime
+from pydantic import AnyUrl, Field, RootModel
 from pydantic_extra_types.pendulum_dt import Date, DateTime
 
 from ..v2 import MyPersonBaseModel
@@ -44,36 +44,120 @@ class Type(str, Enum):
 
 
 class CustomAttributeValueString(MyPersonBaseModel):
+    id: str
+    """
+    The unique identifier for this custom attribute.
+    """
+    global_id: str
+    """
+    The global identifier for this attribute.
+    """
+    label: str | None = None
+    """
+    The label defined for this attribute.
+    """
     type: Literal["string"]
     value: str
 
 
 class CustomAttributeUnspecified(MyPersonBaseModel):
+    id: str
+    """
+    The unique identifier for this custom attribute.
+    """
+    global_id: str
+    """
+    The global identifier for this attribute.
+    """
+    label: str | None = None
+    """
+    The label defined for this attribute.
+    """
     type: Literal["unspecified"]
     value: Dict[str, Any]
 
 
 class CustomAttributeValueInt(MyPersonBaseModel):
+    id: str
+    """
+    The unique identifier for this custom attribute.
+    """
+    global_id: str
+    """
+    The global identifier for this attribute.
+    """
+    label: str | None = None
+    """
+    The label defined for this attribute.
+    """
     type: Literal["int"]
     value: float
 
 
 class CustomAttributeValueDouble(MyPersonBaseModel):
+    id: str
+    """
+    The unique identifier for this custom attribute.
+    """
+    global_id: str
+    """
+    The global identifier for this attribute.
+    """
+    label: str | None = None
+    """
+    The label defined for this attribute.
+    """
     type: Literal["double"]
     value: float
 
 
 class CustomAttributeValueDate(MyPersonBaseModel):
+    id: str
+    """
+    The unique identifier for this custom attribute.
+    """
+    global_id: str
+    """
+    The global identifier for this attribute.
+    """
+    label: str | None = None
+    """
+    The label defined for this attribute.
+    """
     type: Literal["date"]
-    value: DateTime
+    value: Date
 
 
 class CustomAttributeValueBoolean(MyPersonBaseModel):
+    id: str
+    """
+    The unique identifier for this custom attribute.
+    """
+    global_id: str
+    """
+    The global identifier for this attribute.
+    """
+    label: str | None = None
+    """
+    The label defined for this attribute.
+    """
     type: Literal["boolean"]
     value: bool
 
 
 class CustomAttributeValueStringList(MyPersonBaseModel):
+    id: str
+    """
+    The unique identifier for this custom attribute.
+    """
+    global_id: str
+    """
+    The global identifier for this attribute.
+    """
+    label: str | None = None
+    """
+    The label defined for this attribute.
+    """
     type: Literal["string_list"]
     value: List[str]
 
@@ -116,24 +200,18 @@ class ErrorDetail(MyPersonBaseModel):
     """
 
 
-class CustomAttribute(MyPersonBaseModel):
-    id: str
-    """
-    The unique identifier for this custom attribute.
-    """
-    type: Type
-    """
-    The type of the custom attribute.
-    """
-    global_id: str
-    """
-    The global identifier for this attribute.
-    """
-    label: str | None = None
-    """
-    The label defined for this attribute.
-    """
-    value: Annotated[
+class CustomAttributes(
+    RootModel[
+        CustomAttributeValueString
+        | CustomAttributeValueInt
+        | CustomAttributeValueDouble
+        | CustomAttributeValueDate
+        | CustomAttributeValueBoolean
+        | CustomAttributeValueStringList
+        | CustomAttributeUnspecified
+    ]
+):
+    root: Annotated[
         CustomAttributeValueString
         | CustomAttributeValueInt
         | CustomAttributeValueDouble
@@ -143,27 +221,16 @@ class CustomAttribute(MyPersonBaseModel):
         | CustomAttributeUnspecified,
         Field(discriminator="type"),
     ]
-    """
-    The value of the custom attribute.
-    """
-
-
-class BadRequestError(MyPersonBaseModel):
-    personio_trace_id: str
-    """
-    A unique ID that was created for this error.
-    """
-    timestamp: DateTime
-    """
-    The timestamp of when the error occurred.
-    """
-    errors: List[ErrorDetail]
 
 
 class Person(MyPersonBaseModel):
     id: str
     """
     The unique identifier for the Person.
+    """
+    field_meta: Annotated[Dict[str, Any], Field(alias="_meta")]
+    """
+    Has additional fields.
     """
     email: str
     """
@@ -202,7 +269,7 @@ class Person(MyPersonBaseModel):
     """
     The status of the person
     """
-    custom_attributes: List[CustomAttribute]
+    custom_attributes: List[CustomAttributes]
     """
     A list of custom attributes.
     """
@@ -210,3 +277,36 @@ class Person(MyPersonBaseModel):
     """
     A list of employments.
     """
+
+
+class CustomAttribute(MyPersonBaseModel):
+    type: Type
+    """
+    The type of the custom attribute.
+    """
+    value: Annotated[
+        CustomAttributeValueString
+        | CustomAttributeValueInt
+        | CustomAttributeValueDouble
+        | CustomAttributeValueDate
+        | CustomAttributeValueBoolean
+        | CustomAttributeValueStringList
+        | CustomAttributeUnspecified
+        | None,
+        Field(discriminator="type"),
+    ] = None
+    """
+    The value of the custom attribute.
+    """
+
+
+class RequestError(MyPersonBaseModel):
+    personio_trace_id: str
+    """
+    A unique ID that was created for this error.
+    """
+    timestamp: DateTime
+    """
+    The timestamp of when the error occurred.
+    """
+    errors: List[ErrorDetail]

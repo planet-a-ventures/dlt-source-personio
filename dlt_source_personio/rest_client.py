@@ -1,13 +1,12 @@
 from typing import Any
 import logging
-from pydantic import ValidationError
 
 import dlt
 from dlt.sources.helpers.rest_client.client import RESTClient, Response
 from dlt.sources.helpers.rest_client.paginators import JSONLinkPaginator
 
 from .personio_oauth2_client_credentials import PersonioOAuth2ClientCredentials
-from .settings import x_personio_app_id
+from .settings import X_PERSONIO_APP_ID
 
 from .settings import API_BASE
 from dlt.sources.helpers.requests.session import Session
@@ -37,7 +36,7 @@ def get_rest_client(
         base_url=api_base,
         headers={
             "Accept": "application/json",
-            "X-Personio-App-ID": x_personio_app_id,
+            "X-Personio-App-ID": X_PERSONIO_APP_ID,
         },
         auth=auth,
         data_selector="_data",
@@ -64,5 +63,5 @@ hooks = {
         raise_for_status,
     ]
 }
-V2_MAX_PAGE_LIMIT = 1
+V2_MAX_PAGE_LIMIT = 50
 V1_BASE_PAGE = 0

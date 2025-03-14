@@ -123,7 +123,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BadRequestError'
+                $ref: '#/components/schemas/RequestError'
 components:
   securitySchemes:
     oauth2:
@@ -155,6 +155,10 @@ components:
         id:
           type: string
           description: The unique identifier for the Person.
+        _meta:
+          type: object
+          additionalProperties: true
+          description: Has additional fields.
         email:
           type: string
           description: >
@@ -204,7 +208,24 @@ components:
           type: array
           description: A list of custom attributes.
           items:
-            $ref: '#/components/schemas/CustomAttribute'
+            oneOf:
+              - $ref: '#/components/schemas/CustomAttributeValueString'
+              - $ref: '#/components/schemas/CustomAttributeValueInt'
+              - $ref: '#/components/schemas/CustomAttributeValueDouble'
+              - $ref: '#/components/schemas/CustomAttributeValueDate'
+              - $ref: '#/components/schemas/CustomAttributeValueBoolean'
+              - $ref: '#/components/schemas/CustomAttributeValueStringList'
+              - $ref: '#/components/schemas/CustomAttributeUnspecified'
+            discriminator:
+              propertyName: type
+              mapping:
+                string: '#/components/schemas/CustomAttributeValueString'
+                int: '#/components/schemas/CustomAttributeValueInt'
+                double: '#/components/schemas/CustomAttributeValueDouble'
+                date: '#/components/schemas/CustomAttributeValueDate'
+                boolean: '#/components/schemas/CustomAttributeValueBoolean'
+                string_list: '#/components/schemas/CustomAttributeValueStringList'
+                unspecified: '#/components/schemas/CustomAttributeUnspecified'
         employments:
           type: array
           description: A list of employments.
@@ -213,14 +234,8 @@ components:
     CustomAttribute:
       type: object
       required:
-        - id
         - type
-        - global_id
-        - value
       properties:
-        id:
-          type: string
-          description: The unique identifier for this custom attribute.
         type:
           type: string
           enum:
@@ -232,12 +247,6 @@ components:
             - boolean
             - string_list
           description: The type of the custom attribute.
-        global_id:
-          type: string
-          description: The global identifier for this attribute.
-        label:
-          type: string
-          description: The label defined for this attribute.
         value:
           description: The value of the custom attribute.
           oneOf:
@@ -260,75 +269,155 @@ components:
               unspecified: '#/components/schemas/CustomAttributeUnspecified'
     CustomAttributeValueString:
       type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
       properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
         type:
           type: string
           const: string
         value:
           type: string
-      required:
-        - type
-        - value
     CustomAttributeUnspecified:
       type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
       properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
         type:
           type: string
           const: unspecified
         value:
           type: object
           additionalProperties: true
-      required:
-        - type
-        - value
     CustomAttributeValueInt:
       type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
       properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
         type:
           type: string
           const: int
         value:
           type: number
-      required:
-        - type
-        - value
     CustomAttributeValueDouble:
       type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
       properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
         type:
           type: string
           const: double
         value:
           type: number
-      required:
-        - type
-        - value
     CustomAttributeValueDate:
       type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
       properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
         type:
           type: string
           const: date
         value:
           type: string
-          format: date-time
-      required:
-        - type
-        - value
+          format: date
     CustomAttributeValueBoolean:
       type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
       properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
         type:
           type: string
           const: boolean
         value:
           type: boolean
-      required:
-        - type
-        - value
     CustomAttributeValueStringList:
       type: object
+      required:
+        - id
+        - type
+        - global_id
+        - value
       properties:
+        id:
+          type: string
+          description: The unique identifier for this custom attribute.
+        global_id:
+          type: string
+          description: The global identifier for this attribute.
+        label:
+          type: string
+          description: The label defined for this attribute.
         type:
           type: string
           const: string_list
@@ -336,9 +425,6 @@ components:
           type: array
           items:
             type: string
-      required:
-        - type
-        - value
     Employment:
       type: object
       required:
@@ -357,7 +443,7 @@ components:
               type: object
               additionalProperties: true
               description: Additional metadata links.
-    BadRequestError:
+    RequestError:
       type: object
       properties:
         personio_trace_id:

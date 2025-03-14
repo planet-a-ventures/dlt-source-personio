@@ -1,0 +1,289 @@
+openapi: 3.0.3
+info:
+  title: Personio API
+  version: "1.0.0"
+  description: |
+    API for retrieving employment records for a given person.
+    This endpoint returns a list of employment records associated with the specified person.
+servers:
+  - url: https://api.personio.de/v2
+paths:
+  /persons/{person_id}/employments:
+    get:
+      summary: Get employments for a person
+      description: Retrieves all employment records for the specified person.
+      security:
+        - oauth2: ["personio:persons:read"]
+      parameters:
+        - name: person_id
+          in: path
+          description: The unique identifier of the person.
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: >
+            The amount of resources to be returned per one request. It can range between 1 and 50, and the default is 10.
+
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: cursor
+          in: query
+          description: >
+            The pagination cursor to navigate over to the next list of resources. If cursor is missing, the first page is returned.
+
+          required: false
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: Filter results matching one or more provided employment ids.
+          required: false
+          schema:
+            type: string
+        - name: updated_at
+          in: query
+          description: Filter employments by updated date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: updated_at.gt
+          in: query
+          description: Filter employments updated after the provided date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: updated_at.lt
+          in: query
+          description: Filter employments updated before the provided date.
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _data:
+                    type: array
+                    description: List of employment records.
+                    items:
+                      $ref: '#/components/schemas/Employment'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: './person.yaml#/components/schemas/RequestError'
+        '404':
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: './person.yaml#/components/schemas/RequestError'
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/auth
+          tokenUrl: https://example.com/token
+          scopes:
+            "personio:persons:read": "Read access to persons"
+  schemas:
+    Employment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the employment.
+        position:
+          $ref: '#/components/schemas/Position'
+        weekly_working_hours:
+          type: number
+          description: The total amount of weekly working hours.
+        full_time_weekly_working_hours:
+          type: number
+          description: The number of hours per week that is considered full time for the employment.
+        probation_end_date:
+          type: string
+          format: date
+          description: The date that marks the end of the probation period.
+        employment_start_date:
+          type: string
+          format: date
+          description: The date that marks the start of the employment.
+        employment_end_date:
+          type: string
+          format: date
+          description: The date that marks the end of the employment.
+        type:
+          type: string
+          description: The employment type.
+          enum:
+            - UNSPECIFIED
+            - INTERNAL
+            - EXTERNAL
+        contract_end_date:
+          type: string
+          format: date
+          description: The date the contract ends for this employment.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time this employment was created in Personio.
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time this employment was last updated in Personio.
+        supervisor:
+          oneOf:
+            - type: null
+            - $ref: '#/components/schemas/Supervisor'
+        person:
+          $ref: '#/components/schemas/Person'
+        office:
+          $ref: '#/components/schemas/Office'
+        org_units:
+          type: array
+          description: All Org Units, i.e. department and team, directly associated with the employment.
+          items:
+            $ref: '#/components/schemas/OrgUnit'
+        termination:
+          $ref: '#/components/schemas/Termination'
+        cost_centers:
+          type: array
+          description: The list of cost centers this employment is attached to.
+          items:
+            $ref: '#/components/schemas/CostCenter'
+        legal_entity:
+          $ref: '#/components/schemas/LegalEntity'
+        sub_company:
+          $ref: '#/components/schemas/SubCompany'
+        status:
+          type: string
+          description: The status of the employment.
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - ONBOARDING
+            - LEAVE
+            - UNSPECIFIED
+        _meta:
+          $ref: '#/components/schemas/Meta'
+      required:
+        - id
+        - created_at
+        - updated_at
+        - person
+    Position:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the position.
+    Supervisor:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the supervisor.
+    Office:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the office.
+    OrgUnit:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of the Org Unit, e.g. team or department.
+        id:
+          type: string
+          description: The internal ID of the Org Unit.
+    Person:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the person.
+    Termination:
+      type: object
+      properties:
+        termination_date:
+          type: string
+          format: date
+          description: The termination date.
+        last_working_day:
+          type: string
+          format: date
+          description: The last working day date.
+        terminated_at:
+          type: string
+          format: date
+          description: The date on which an employee submits their resignation or the employer issues a termination notice.
+        type:
+          type: string
+          description: The type of termination.
+          enum:
+            - UNSPECIFIED
+            - EMPLOYEE
+            - FIRED
+            - DEATH
+            - CONTRACT_EXPIRED
+            - AGREEMENT
+            - SUB_COMPANY_SWITCH
+            - IRREVOCABLE_SUSPENSION
+            - CANCELLATION
+            - COLLECTIVE_AGREEMENT
+            - SETTLEMENT_AGREEMENT
+            - RETIREMENT
+            - COURT_SETTLEMENT
+            - QUIT
+        reason:
+          type: string
+          description: The reason of the termination.
+    CostCenter:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the cost center.
+        weight:
+          type: number
+          description: The weight of the cost center.
+    LegalEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the employment legal entity.
+    SubCompany:
+      type: object
+      description: Deprecated. Use legal_entity instead.
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the employment sub-company.
+    Meta:
+      type: object
+      description: Metadata information for the employment.
+      properties:
+        links:
+          type: object
+          additionalProperties: true
+          description: Additional metadata links.

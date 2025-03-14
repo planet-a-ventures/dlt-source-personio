@@ -1,4 +1,4 @@
-from .settings import x_personio_app_id
+from .settings import X_PERSONIO_APP_ID
 from .settings import V2_AUTH_REVOKE, V2_AUTH_TOKEN
 from .type_adapters import auth_adapter
 
@@ -12,13 +12,12 @@ from typing import Any
 class PersonioOAuth2ClientCredentials(OAuth2ClientCredentials):
     """
     OAuth2 client credentials for Personio API
-    """    
+    """
 
     api_base: str
     """
     The base URL of the Personio API
     """
-
 
     def __init__(self, api_base: str, *args, **kwargs):
         self.api_base = api_base
@@ -38,7 +37,7 @@ class PersonioOAuth2ClientCredentials(OAuth2ClientCredentials):
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
                 "Authorization": f"Bearer {self.access_token}",
-                "X-Personio-App-ID": x_personio_app_id,
+                "X-Personio-App-ID": X_PERSONIO_APP_ID,
             },
             data={
                 "token": self.access_token,
