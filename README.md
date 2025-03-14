@@ -11,9 +11,10 @@ keywords: [personio API, personio.com]
 
 Currently loads the following data:
 
-| Table | Contains |
-| -- | -- |
-| `employees` | Items of the `Employee` model with all properties |
+| Table | Contains | Spec version |
+| -- | -- | -- |
+| `persons` | Items of the `Person` model with all properties | `V2` |
+| `employments` | Items of the `Employment` model with all properties | `V2` |
 
 ## Usage
 
@@ -47,7 +48,8 @@ Commands:
 | Command | What does it do? |
 | -- | -- |
 | `generate-model` | generates the personio Pydantic model from the current spec file, applies patches, etc. |
-| `update-spec` | Pulls in the latest `main#HEAD` of [planet-a-ventures/personio-openapi-spec](https://github.com/planet-a-ventures/personio-openapi-spec) |
+| `update-spec` | Pulls in the latest `master#HEAD` of [personio/api-docs](https://github.com/personio/api-docs) |
+| `validate-spec` | Validates the local (unofficial) Personio V2 spec |
 | `refresh-model` | Both commands above plus adds it to git and commits the changes. |
 | `format` | Formats & lints all code |
 | `sample-pipeline-run` | Runs the sample pipeline. By default `dev_mode=True` which fetches resources with a limit of 1 (page) |
