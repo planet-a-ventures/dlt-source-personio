@@ -15,3 +15,7 @@ class MyPersonBaseModel(MyBaseModel):
 
 class MyEmploymentBaseModel(MyBaseModel):
     pass
+
+
+class MyErrorsBaseModel(MyBaseModel):
+    pass
