@@ -181,25 +181,6 @@ class Employment(MyPersonBaseModel):
     """
 
 
-class ErrorDetail(MyPersonBaseModel):
-    title: str
-    """
-    The title of the error.
-    """
-    detail: str
-    """
-    A short description about the error.
-    """
-    type: AnyUrl
-    """
-    A link to the developer hub where more information can be found for the encountered error.
-    """
-    field_meta: Annotated[Dict[str, Any], Field(alias="_meta")]
-    """
-    Has additional fields.
-    """
-
-
 class CustomAttributes(
     RootModel[
         CustomAttributeValueString
@@ -298,15 +279,3 @@ class CustomAttribute(MyPersonBaseModel):
     """
     The value of the custom attribute.
     """
-
-
-class RequestError(MyPersonBaseModel):
-    personio_trace_id: str
-    """
-    A unique ID that was created for this error.
-    """
-    timestamp: DateTime
-    """
-    The timestamp of when the error occurred.
-    """
-    errors: List[ErrorDetail]

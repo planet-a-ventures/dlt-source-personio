@@ -54,6 +54,7 @@ def debug_response(response: Response, *args: Any, **kwargs: Any) -> None:
 
 
 def raise_for_status(response: Response, *args: Any, **kwargs: Any) -> None:
+    # TODO: Add more detailed error handling, using the Personio error response model
     response.raise_for_status()
 
 

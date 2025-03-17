@@ -62,7 +62,7 @@ main() {
     log "V2 spec"
 
     local basename_capitalized
-    for file in v2_spec/*.yaml; do
+    for file in v2_spec/[^_]*.yaml; do
         b=$(basename "${file}" .yaml)
         basename_capitalized="${b^}"
 

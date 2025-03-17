@@ -1,0 +1,47 @@
+openapi: 3.1.0
+info:
+  title: Personio API - Errors
+  version: "2"
+  description: Shared errors and error responses across all Personio API endpoints.
+components:
+  schemas:
+    RequestError:
+      type: object
+      properties:
+        personio_trace_id:
+          type: string
+          description: A unique ID that was created for this error.
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of when the error occurred.
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+      required:
+        - personio_trace_id
+        - timestamp
+        - errors
+    ErrorDetail:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the error.
+        detail:
+          type: string
+          description: A short description about the error.
+        type:
+          type: string
+          format: uri
+          description: A link to the developer hub where more information can be found for the encountered error.
+        _meta:
+          type: object
+          additionalProperties: true
+          description: Has additional fields.
+      required:
+        - title
+        - detail
+        - type
+        - _meta

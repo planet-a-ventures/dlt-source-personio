@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: Personio API
+  title: Personio API - Employments
   version: "1.0.0"
   description: |
     API for retrieving employment records for a given person.
@@ -85,13 +85,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './person.yaml#/components/schemas/RequestError'
+                $ref: './errors.yaml#/components/schemas/RequestError'
         '404':
           description: Not found.
           content:
             application/json:
               schema:
-                $ref: './person.yaml#/components/schemas/RequestError'
+                $ref: './errors.yaml#/components/schemas/RequestError'
 components:
   securitySchemes:
     oauth2:
