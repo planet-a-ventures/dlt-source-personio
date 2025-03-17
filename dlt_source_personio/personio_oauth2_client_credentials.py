@@ -1,3 +1,4 @@
+from urllib.parse import urljoin
 from .settings import X_PERSONIO_APP_ID
 from .settings import V2_AUTH_REVOKE, V2_AUTH_TOKEN
 from .type_adapters import auth_adapter
@@ -21,7 +22,9 @@ class PersonioOAuth2ClientCredentials(OAuth2ClientCredentials):
 
     def __init__(self, api_base: str, *args, **kwargs):
         self.api_base = api_base
-        super().__init__(access_token_url=api_base + V2_AUTH_TOKEN, *args, **kwargs)
+        super().__init__(
+            access_token_url=urljoin(self.api_base, V2_AUTH_TOKEN), *args, **kwargs
+        )
 
     def revoke_token(self) -> None:
         """
@@ -32,7 +35,7 @@ class PersonioOAuth2ClientCredentials(OAuth2ClientCredentials):
             return
 
         response = self.session.post(
-            self.api_base + V2_AUTH_REVOKE,
+            urljoin(self.api_base, V2_AUTH_REVOKE),
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
