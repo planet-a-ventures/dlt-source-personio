@@ -14,7 +14,28 @@ Currently loads the following data:
 | Table | Contains | Spec version |
 | -- | -- | -- |
 | `persons` | Items of the `Person` model with all properties | `V2` |
+| `persons_custom_attributes` | All defined custom attributes. The table is pivoted, so each custom attribute becomes a column in the table. | `V2` |
 | `employments` | Items of the `Employment` model with all properties | `V2` |
+
+## Why are you not using the `dlt-hub/verified-sources` personio source / Differences
+
+The [official verified source](https://github.com/dlt-hub/verified-sources/tree/master/sources/personio)
+has a few drawbacks:
+
+- it is based on the Personio API V1, not the current V2
+- on usage of the verified source, a copy of the current state of
+  the `dlt-hub/verified-sources` repository is copied into your project;
+  Once you make changes to it, it effectively becomes a fork,
+  making it hard to update after the fact.
+- The verified source does not use any data validation other than
+  ensuring dates are correct; This means that data shape is not guaranteed,
+  resulting in potential schema changes.
+  This data source uses an (unofficial) OpenAPI spec, which is transformed
+  into Pydantic 2 models.
+
+Currently this data source does not support delta updates
+(the verified source does) and it also does not contain some of the data
+sources (absences, etc.). Contributions are welcome!
 
 ## Usage
 
