@@ -22,13 +22,9 @@ dev = [
     "pytest>=8.3.4",
 ]
 
-[tool.black]
-include = '.*py$'
-
-[tool.autoflake]
-remove-all-unused-imports = true
-remove-unused-variables = true
-exclude = [
+[tool.ruff]
+force-exclude = true
+extend-exclude = [
     "dlt_source_personio/model/v1/**",
     "dlt_source_personio/model/v2/**",
 ]

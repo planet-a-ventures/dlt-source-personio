@@ -54,7 +54,6 @@ in
 
   git-hooks.hooks = {
     shellcheck.enable = true;
-    black.enable = true;
     typos.enable = true;
     typos.excludes = [
       spec_folder
@@ -76,11 +75,11 @@ in
       ]
     );
     markdownlint.enable = true;
-    autoflake.enable = true;
+    ruff.enable = true;
+    ruff-format.enable = true;
   };
 
   scripts.format.exec = ''
-    yamlfmt .
     markdownlint --fix .
     pre-commit run --all-files
   '';
