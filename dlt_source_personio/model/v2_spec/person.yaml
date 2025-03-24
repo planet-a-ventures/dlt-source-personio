@@ -196,7 +196,7 @@ components:
             url:
               type: string
               format: uri
-              description: The URL to the profile picture.
+              description: The URL to the profile picture endpoint.
         status:
           type: string
           enum:
