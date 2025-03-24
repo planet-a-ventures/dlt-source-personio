@@ -15,6 +15,7 @@ Currently loads the following data:
 | -- | -- | -- |
 | `persons` | Items of the `Person` model with all properties | `V2` |
 | `persons_custom_attributes` | All defined custom attributes. The table is pivoted, so each custom attribute becomes a column in the table. | `V2` |
+| `persons_profile_pictures` | The profile picture for each employee (that has defined one) | `V1` |
 | `employments` | Items of the `Employment` model with all properties | `V2` |
 
 ## Why are you not using the `dlt-hub/verified-sources` personio source / Differences

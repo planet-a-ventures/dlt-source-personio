@@ -23,7 +23,7 @@ class Gender(str, Enum):
 class ProfilePicture(MyPersonBaseModel):
     url: AnyUrl | None = None
     """
-    The URL to the profile picture.
+    The URL to the profile picture endpoint.
     """
 
 

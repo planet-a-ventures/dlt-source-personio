@@ -65,6 +65,7 @@ class Table(StrEnum):
     CUSTOM_ATTRIBUTES = "persons_custom_attributes"
     EMPLOYMENTS = "employments"
     PERSONS = "persons"
+    PERSONS_PROFILE_PICTURES = "persons_profile_pictures"
 
 
 def use_id(entity: Person, **kwargs) -> dict:
@@ -120,11 +121,41 @@ def __get_id(obj):
 )
 async def person_details(persons: List[Person], rest_client: RESTClient):
     yield [
-        use_id(person, exclude=["field_meta", "custom_attributes", "employments"])
+        use_id(
+            person,
+            exclude=[
+                "field_meta",
+                "custom_attributes",
+                "employments",
+                "profile_picture",
+            ],
+        )
         for person in persons
     ]
     for person in persons:
         yield person_employments(person, rest_client)
+
+        if person.profile_picture.url:
+            # TODO: Pass `headers={"Accept": "image/*"}` to the REST client once
+            # https://github.com/dlt-hub/dlt/pull/2434 is merged
+            response = rest_client.get(str(person.profile_picture.url))
+            if not response.ok:
+                logging.error(
+                    f"Failed to download profile picture for person {person.id}"
+                )
+            else:
+                yield dlt.mark.with_hints(
+                    item={"person_id": person.id, "profile_picture": response.content},
+                    hints=dlt.mark.make_hints(
+                        table_name=Table.PERSONS_PROFILE_PICTURES.value,
+                        primary_key="person_id",
+                        merge_key="person_id",
+                        write_disposition="merge",
+                    ),
+                    # needs to be a variant due to https://github.com/dlt-hub/dlt/pull/2109
+                    create_table_variant=True,
+                )
+
         yield dlt.mark.with_hints(
             item={"person_id": person.id}
             | {cas.root.id: cas.root.value for cas in person.custom_attributes},
