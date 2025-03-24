@@ -1,13 +1,23 @@
 [project]
 name = "dlt-source-personio"
-readme = "README.md"
+version = "0.0.1"
+authors = [{name = "Planet A GmbH", email = "dev@planet-a.com"}]
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
+description = "A DLT source for personio"
+keywords = ["dlt", "source", "personio", "dlthub"]
+urls = {"Repository" = "https://github.com/planet-a-ventures/dlt-source-personio"}
 dependencies = [
     "dlt>=1.8.0",
     "jmespath>=1.0.1",
     "pydantic-extra-types>=2.10.3",
 ]
-dynamic = ["authors", "classifiers", "version", "description"]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+license = {file = "LICENSE"}
 
 [project.optional-dependencies]
 show = [
@@ -28,3 +38,6 @@ extend-exclude = [
     "dlt_source_personio/model/v1/**",
     "dlt_source_personio/model/v2/**",
 ]
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
