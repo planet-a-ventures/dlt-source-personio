@@ -136,9 +136,9 @@ async def person_details(persons: List[Person], rest_client: RESTClient):
         yield person_employments(person, rest_client)
 
         if person.profile_picture.url:
-            # TODO: Pass `headers={"Accept": "image/*"}` to the REST client once
-            # https://github.com/dlt-hub/dlt/pull/2434 is merged
-            response = rest_client.get(str(person.profile_picture.url))
+            response = rest_client.get(
+                str(person.profile_picture.url), headers={"Accept": "image/*"}
+            )
             if not response.ok:
                 logging.error(
                     f"Failed to download profile picture for person {person.id}"
