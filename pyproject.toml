@@ -74,3 +74,5 @@ exclude = [
 vcs = "git"
 style = "semver"
 strict = true
+bump = true
+latest-tag = true
