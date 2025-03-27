@@ -73,4 +73,4 @@ exclude = [
 [tool.uv-dynamic-versioning]
 vcs = "git"
 style = "semver"
-bump = true
+strict = true
