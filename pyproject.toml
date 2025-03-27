@@ -1,7 +1,10 @@
 [project]
 name = "dlt-source-personio"
-version = "0.0.2"
-authors = [{name = "Planet A GmbH", email = "dev@planet-a.com"}]
+dynamic = ["version"]
+authors = [{ name = "Planet A Ventures" }]
+maintainers = [
+    { name = "Joscha Feth", email = "joscha@planet-a.com" },
+]
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
 description = "A DLT source for personio"
@@ -13,23 +16,24 @@ dependencies = [
     "pydantic-extra-types>=2.10.3",
 ]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-license = {file = "LICENSE"}
-
-[project.optional-dependencies]
-show = [
-    "dlt[duckdb]>=1.8.0",
-    "streamlit>=1.41.1",
-    "watchdog>=6.0.0",
-]
+license = { text = "MIT" }
 
 [dependency-groups]
 dev = [
     "datamodel-code-generator>=0.28.3",
     "pytest>=8.3.4",
+]
+show = [
+    "dlt[duckdb]>=1.9.0",
+    "streamlit>=1.41.1",
+    "watchdog>=6.0.0",
 ]
 
 [tool.ruff]
@@ -39,5 +43,34 @@ extend-exclude = [
     "dlt_source_personio/model/v2/**",
 ]
 
-[tool.setuptools.packages.find]
-exclude = ["tests"]
+# [tool.setuptools.packages.find]
+# exclude = ["tests"]
+
+[tool.uv]
+resolution = "highest"
+default-groups = ["dev", "show"]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build]
+include = [
+  "dlt_source_personio"
+]
+exclude = [
+  "/dlt_source_personio/model/spec",
+  "/dlt_source_personio/model/v2_spec",
+  "/dlt_source_personio/model/current_python_major_minor.py",
+  "/dlt_source_personio/model/generate_model.sh",
+  "/dlt_source_personio/model/README.md",
+  "tests",
+]
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "semver"
+bump = true
