@@ -210,7 +210,7 @@ wheels = [
 
 [[package]]
 name = "dlt"
-version = "1.8.1"
+version = "1.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -236,15 +236,16 @@ dependencies = [
     { name = "semver" },
     { name = "setuptools" },
     { name = "simplejson" },
+    { name = "sqlglot" },
     { name = "tenacity" },
     { name = "tomlkit" },
     { name = "typing-extensions" },
     { name = "tzdata" },
     { name = "win-precise-time", marker = "os_name == 'nt'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c1/20/66208fac68dd0e7c6969dce42c63792319abd7621f0fbdf0064847f50c03/dlt-1.8.1.tar.gz", hash = "sha256:6ff9c56d7ea416cd01bce874348023042a441d6f83b35495d234efd709d9fd77", size = 712482 }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/d6/e6f7875e82a127b2fd0e603f61257876889c6d021c0f2afec3b61e6bd8df/dlt-1.9.0.tar.gz", hash = "sha256:d274e9de1e993a2cf21862c9c34a457fa4ba3794e9be379d8f5a7530fbc709e9", size = 716259 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dc/ec/fbd5fe25dc4d9d26b75163633ce8f7dc7bdf7d6e4a5799386961ba3acc4e/dlt-1.8.1-py3-none-any.whl", hash = "sha256:154699cc70e4263a294b576ca8d22bb7e153bfb872acabba08fcfecd9b9d285a", size = 897686 },
+    { url = "https://files.pythonhosted.org/packages/66/17/b026fb71eb0ed16cd207b8f76f4e97b05ef8ff4e461254aeac47d647f128/dlt-1.9.0-py3-none-any.whl", hash = "sha256:4b95f5ba243a4b694d33915145d71ed389499e68e76693b80219de53108a31b8", size = 901312 },
 ]
 
 [package.optional-dependencies]
