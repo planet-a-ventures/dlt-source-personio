@@ -2,6 +2,7 @@ from typing import Any
 import logging
 
 import dlt
+from dlt.sources.helpers.requests.retry import Client
 from dlt.sources.helpers.rest_client.client import RESTClient, Response
 from dlt.sources.helpers.rest_client.paginators import JSONLinkPaginator
 
@@ -12,7 +13,11 @@ from .settings import API_BASE
 from dlt.sources.helpers.requests.session import Session
 
 # Share a session (and thus pool) between all rest clients
-session: Session = Session(raise_for_status=False)
+# Client by default retries on all 5xx errors (including 502, 504) and 429
+# with exponential backoff, up to 5 attempts
+session: Session = Client(
+    raise_for_status=False,
+).session
 
 auth: PersonioOAuth2ClientCredentials = None
 
