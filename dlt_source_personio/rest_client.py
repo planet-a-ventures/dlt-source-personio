@@ -4,6 +4,8 @@ import logging
 import dlt
 from dlt.sources.helpers.rest_client.client import RESTClient, Response
 from dlt.sources.helpers.rest_client.paginators import JSONLinkPaginator
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from .personio_oauth2_client_credentials import PersonioOAuth2ClientCredentials
 from .settings import X_PERSONIO_APP_ID
@@ -11,8 +13,29 @@ from .settings import X_PERSONIO_APP_ID
 from .settings import API_BASE
 from dlt.sources.helpers.requests.session import Session
 
+# Configure retry strategy for gateway errors (502, 504)
+retry_strategy = Retry(
+    total=3,  # Maximum number of retries
+    status_forcelist=[502, 504],  # Retry on 502 Bad Gateway and 504 Gateway Timeout
+    allowed_methods=[
+        "HEAD",
+        "GET",
+        "PUT",
+        "DELETE",
+        "OPTIONS",
+        "TRACE",
+        "POST",
+    ],  # Retry on all methods
+    backoff_factor=1,  # Wait 1s, 2s, 4s between retries
+)
+
 # Share a session (and thus pool) between all rest clients
 session: Session = Session(raise_for_status=False)
+
+# Mount the retry adapter to the session for both HTTP and HTTPS
+adapter = HTTPAdapter(max_retries=retry_strategy)
+session.mount("http://", adapter)
+session.mount("https://", adapter)
 
 auth: PersonioOAuth2ClientCredentials = None
 
